@@ -15,7 +15,7 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel("DEBUG")
 
 log_file_path = os.path.join(log_dir,"data_ingestion.log")
-file_handler = logging.FileHandler()
+file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel("DEBUG")
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -36,12 +36,12 @@ def load_data(data_url:str)-> pd.DataFrame:
         raise
     except Exception as e:
         logger.error("unexpected error occur while loading the file %s",e)
+        raise
 
 def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
     # preprocessing the data 
     try:
-        pass
-
+        return df
     except KeyError as e:
         logger.error("Missing column in data : %s",e)
         raise
@@ -64,7 +64,7 @@ def save_data(train:pd.DataFrame , test: pd.DataFrame, data_path:str)->None:
 def main():
     try :
         test_size = 0.2
-        data_path = ""
+        data_path = "/Users/sarthaktyagi/Desktop/30days-3oprojects/youtubeMLOps/Customer-Churn-Records.csv"
 
         df = load_data(data_path)
         final_data = preprocess_data(df)
