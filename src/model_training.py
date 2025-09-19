@@ -4,7 +4,7 @@ import pandas as pd
 import logging 
 import os 
 from sklearn.ensemble import RandomForestClassifier
-
+import yaml
 log_dir = 'logs'
 os.makedirs(log_dir,exist_ok=True)
 
@@ -21,6 +21,17 @@ file_handler.setLevel(logging.DEBUG)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+def load_params(params_path:str)-> dict:
+    '''Load Parameters from a YAML file'''
+    try:
+        with open(params_path,"r")as file:
+            params = yaml.safe_load(file)
+        logger.info("file loaded succesfully")
+        return params
+    except Exception as e:
+        logger.error("error occured while loading the yaml file : %s",e)
+        raise
 
 def load_data(file_path:str)->pd.DataFrame:
 
@@ -86,11 +97,12 @@ def model_save(model, file_path: str) -> None:
 
 def main():
     try:
+        params = load_params("/Users/sarthaktyagi/Desktop/30days-3oprojects/youtubeMLOps/params.yaml")
 
         df = load_data('/Users/sarthaktyagi/Desktop/30days-3oprojects/youtubeMLOps/data/interdim/train_final.csv')
         params= {
-            "n_estimators":25,
-            "random_state":2
+            "n_estimators":params['model_training']['n_estimators'],
+            "random_state":params['model_training']['random_state']
         }
         X_train = df.drop(['Exited'],axis =1)
         y_train= df['Exited'].astype(int)
