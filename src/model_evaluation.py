@@ -5,6 +5,8 @@ from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score
 import json 
 import os
 import logging
+from dvclive import Live
+import yaml
 
 log_dir = "logs"
 os.makedirs(log_dir,exist_ok=True)
@@ -22,6 +24,17 @@ file_handler.setLevel(logging.DEBUG)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+def load_params(param_path:str)->dict:
+    '''Loading parameters from yaml file'''
+    try:
+        with open(param_path,'r') as file:
+            params=yaml.safe_load(file)
+        logger.info("file loaded successfully")
+        return params
+    except Exception as e:
+        logger.error("error occured while loading the parameters :%s",e)
+        raise
 
 def load_data(url:str)->pd.DataFrame:
     """
@@ -52,9 +65,12 @@ def load_model(file_path:str):
         raise
 
 
-def evaluation_model(clf,X_test,y_test)->dict:
+def evaluation_model(clf,X_test,y_test,params_path:str)->dict:
     '''evaluate the model and return a evaluation metrics'''
     try:
+        # loading parameter 
+        params = load_params(params_path)
+        # load the data and the model 
         y_pred= clf.predict(X_test)
         y_pred_proba = clf.predict_proba(X_test)
 
@@ -63,6 +79,12 @@ def evaluation_model(clf,X_test,y_test)->dict:
         recall= recall_score(y_test,y_pred)
         f1 = f1_score(y_test,y_pred)
         roc_auc = roc_auc_score(y_test,y_pred_proba[:, 1])
+
+        # experiment tracking 
+        with Live(save_dvc_exp =True) as live:
+            live.log_metric('accuracy',accuracy)
+            live.log_metric('precision',precision)
+
 
         metrics ={
             'accuracy':accuracy,
@@ -93,7 +115,6 @@ def save_metrics(metrics:dict,file_path:str)->None :
 
 def main():
     try:
-        # load the data and the model 
         test_data = pd.read_csv("/Users/sarthaktyagi/Desktop/30days-3oprojects/youtubeMLOps/data/interdim/test_final.csv")
         model = load_model("/Users/sarthaktyagi/Desktop/30days-3oprojects/youtubeMLOps/model/model.pkl")
 
@@ -101,8 +122,8 @@ def main():
         y_test = test_data['Exited'].astype(int)
 
         # calculated metrics 
-        metrics = evaluation_model(model,X_test,y_test)
-
+        metrics = evaluation_model(model,X_test,y_test,'/Users/sarthaktyagi/Desktop/30days-3oprojects/youtubeMLOps/params.yaml')
+        
         save_metrics(metrics,"reports/metrics.json")
 
     except FileNotFoundError as e:

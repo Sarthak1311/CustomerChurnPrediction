@@ -36,3 +36,8 @@ stages:
 
     outs:
     - reports/metrics.json
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step
