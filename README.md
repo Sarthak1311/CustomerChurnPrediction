@@ -72,7 +72,6 @@ dvc repro
 - DVC – data & pipeline versioning
 - dvclive – experiment tracking / live metrics
 - YAML – for configuration (params.yaml)
-- (Any ML libraries you used: scikit-learn, pandas, numpy, etc.)
 - Git & GitHub for version control
 
 
