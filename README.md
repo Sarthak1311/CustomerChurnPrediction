@@ -34,7 +34,6 @@ Predict which customers are likely to churn (i.e. stop using the service) by bui
 3. **Experiment Tracking** — track parameters, metrics, artifacts.  
 4. **Versioning & Reproducibility** — using tools such as DVC to version data and pipeline stages.  
 5. **Configuration Management** — using `params.yaml` and maybe other configuration files.  
-6. **Deployment / Monitoring** (if applicable) — if this is extended into production, includes deploying the model and monitoring performance.
 
 ---
 ## Repository Structure
